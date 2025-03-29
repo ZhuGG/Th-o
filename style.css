@@ -1,0 +1,47 @@
+body {
+  margin: 0;
+  font-family: 'Helvetica Neue', sans-serif;
+  background-color: #fdfdfc;
+  color: #333;
+  line-height: 1.6;
+}
+
+header img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+section {
+  max-width: 900px;
+  margin: 3rem auto;
+  padding: 0 1rem;
+}
+
+h3 {
+  font-size: 1.6rem;
+  color: #00557a;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+p {
+  font-size: 1.1rem;
+  color: #555;
+  text-align: center;
+}
+
+.contact {
+  background-color: #f1f7fa;
+  padding: 2rem;
+  border-radius: 10px;
+  margin-top: 2rem;
+}
+
+footer {
+  text-align: center;
+  padding: 2rem 1rem;
+  background-color: #eaf0f2;
+  color: #666;
+  font-size: 0.9rem;
+}
