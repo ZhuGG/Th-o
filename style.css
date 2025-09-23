@@ -58,7 +58,8 @@ a:focus {
 
 .site-header {
   background: transparent;
-  padding: 1.5rem 1.25rem 0;
+  padding: 1.5rem 1.25rem;
+  margin-bottom: 1.5rem;
 }
 
 .nav {
@@ -141,7 +142,7 @@ a:focus {
 
 .hero {
   max-width: var(--max-width);
-  margin: 4rem auto 0;
+  margin: 2.5rem auto 0;
   display: grid;
   gap: 3rem;
   padding: 3.5rem 2rem;
@@ -193,12 +194,6 @@ a:focus {
   margin: 0;
   font-size: 1.05rem;
   color: var(--color-text-muted);
-}
-
-.hero__cta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
 }
 
 .hero__highlights {
@@ -445,6 +440,12 @@ main {
   margin: 0 auto 2rem;
 }
 
+.cta__details {
+  max-width: 520px;
+  margin: 0 auto;
+  font-weight: 500;
+}
+
 .section--contact {
   background: rgba(255, 255, 255, 0.92);
   border-radius: var(--radius-large);
@@ -475,6 +476,12 @@ address h3,
   color: var(--color-primary-dark);
 }
 
+.contact__info {
+  display: inline-block;
+  font-weight: 600;
+  color: var(--color-primary-dark);
+}
+
 .contact__details {
   background: rgba(255, 255, 255, 0.9);
   border-radius: var(--radius-medium);
@@ -495,6 +502,12 @@ address h3,
   padding: 1.75rem;
   border: 1px solid rgba(30, 107, 139, 0.08);
   box-shadow: 0 18px 38px rgba(15, 63, 88, 0.08);
+}
+
+.contact__note {
+  margin: 1rem 0 0;
+  color: var(--color-primary-dark);
+  font-weight: 500;
 }
 
 .button {
@@ -619,18 +632,13 @@ address h3,
   }
 
   .hero {
-    margin-top: 2.5rem;
+    margin-top: 2rem;
   }
 }
 
 @media (max-width: 600px) {
   .hero {
     padding: 2.5rem 1.75rem;
-  }
-
-  .hero__cta {
-    flex-direction: column;
-    align-items: stretch;
   }
 
   .hero__highlights {
