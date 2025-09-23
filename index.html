@@ -19,14 +19,11 @@
   <body id="top">
     <div class="page">
       <header class="site-header">
-        <figure class="site-header__visual">
-          <img src="theo_header_image.jpg" alt="Carte de visite de Théo Bettollo, infirmier en santé mentale" />
-        </figure>
-        <p class="site-header__quote">
-          « Créer un espace sûr où chacun se sent écouté, respecté et soutenu dans son cheminement. »
-        </p>
         <nav class="nav">
-          <a class="nav__brand sr-only" href="#top">Théo Bettollo · Infirmier santé mentale</a>
+          <a class="nav__brand" href="#top">
+            <span class="nav__brand-title">Théo Bettollo</span>
+            <span class="nav__brand-subtitle">Infirmier spécialisé en santé mentale</span>
+          </a>
           <button class="nav__toggle" type="button" aria-controls="primary-navigation" aria-expanded="false">
             <span class="sr-only">Ouvrir le menu</span>
             <span class="nav__toggle-line"></span>
@@ -40,6 +37,14 @@
             <li><a href="#contact">Contact</a></li>
           </ul>
         </nav>
+        <div class="site-header__intro">
+          <figure class="site-header__visual">
+            <img src="theo_header_image.jpg" alt="Carte de visite de Théo Bettollo, infirmier en santé mentale" />
+          </figure>
+          <p class="site-header__quote">
+            « Créer un espace sûr où chacun se sent écouté, respecté et soutenu dans son cheminement. »
+          </p>
+        </div>
       </header>
 
       <main>
@@ -65,7 +70,30 @@
                 <dd>respect total de votre parcours et de votre rythme</dd>
               </div>
             </dl>
+            <div class="hero__cta">
+              <a class="button button--primary" href="#contact">Prendre rendez-vous</a>
+              <a class="button button--ghost" href="#approche">Découvrir l'approche</a>
+            </div>
+            <div class="hero__signature" aria-label="Signature de Théo Bettollo">
+              <span class="hero__initials" aria-hidden="true">TB</span>
+              <div>
+                <p class="hero__signature-name">Théo Bettollo</p>
+                <p class="hero__signature-role">Infirmier en santé mentale, MSc</p>
+              </div>
+            </div>
           </div>
+          <aside class="hero__insight">
+            <h2>Comment se déroule la première rencontre&nbsp;?</h2>
+            <p>
+              Une séance de 60 minutes pour accueillir votre histoire, identifier vos ressources et définir ensemble les
+              objectifs prioritaires.
+            </p>
+            <ul>
+              <li>Évaluation clinique bienveillante</li>
+              <li>Plan de soin co-construit et modulable</li>
+              <li>Suivi hybride&nbsp;: cabinet et/ou domicile</li>
+            </ul>
+          </aside>
         </section>
 
         <section class="section" id="approche">
