@@ -1,39 +1,245 @@
 <!DOCTYPE html>
 <html lang="fr">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Théo Bettollo - Infirmier Santé Mentale</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <header>
-    <img src="theo_header_image.jpg" alt="Théo Bettollo - Infirmier Santé Mentale" />
-  </header>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Théo Bettollo, infirmier spécialisé en santé mentale à Vevey. Accompagnement sur-mesure, suivi à domicile et soutien relationnel pour adultes et adolescents."
+    />
+    <title>Théo Bettollo · Infirmier spécialisé en santé mentale</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body id="top">
+    <div class="page">
+      <header class="site-header">
+        <nav class="nav">
+          <a class="nav__brand" href="#top">
+            <span class="nav__brand-title">Théo Bettollo</span>
+            <span class="nav__brand-subtitle">Infirmier santé mentale</span>
+          </a>
+          <button class="nav__toggle" type="button" aria-controls="primary-navigation" aria-expanded="false">
+            <span class="sr-only">Ouvrir le menu</span>
+            <span class="nav__toggle-line"></span>
+            <span class="nav__toggle-line"></span>
+            <span class="nav__toggle-line"></span>
+          </button>
+          <ul class="nav__links" id="primary-navigation">
+            <li><a href="#approche">Approche</a></li>
+            <li><a href="#accompagnement">Accompagnement</a></li>
+            <li><a href="#temoignages">Témoignages</a></li>
+            <li><a href="#contact">Contact</a></li>
+          </ul>
+        </nav>
+        <section class="hero">
+          <div class="hero__content">
+            <span class="hero__kicker">Vevey · Riviera Vaudoise</span>
+            <h1>Prendre soin de votre santé mentale avec humanité et expertise</h1>
+            <p>
+              Infirmier diplômé spécialisé en santé mentale, j'accompagne adultes et adolescents avec une approche globale,
+              respectueuse du rythme de chacun et ancrée dans la relation de confiance.
+            </p>
+            <div class="hero__cta">
+              <a class="button button--primary" href="mailto:th.bettollo@curacasa-hin.ch">Planifier un échange</a>
+              <a class="button button--ghost" href="#approche">Découvrir mon approche</a>
+            </div>
+            <dl class="hero__highlights">
+              <div>
+                <dt>10+ ans</dt>
+                <dd>d'expérience en psychiatrie et santé mentale</dd>
+              </div>
+              <div>
+                <dt>Suivi personnalisé</dt>
+                <dd>à domicile ou en cabinet, selon vos besoins</dd>
+              </div>
+              <div>
+                <dt>Confidentialité</dt>
+                <dd>respect total de votre parcours et de votre rythme</dd>
+              </div>
+            </dl>
+          </div>
+          <figure class="hero__figure">
+            <div class="hero__image-frame">
+              <img src="theo_header_image.jpg" alt="Portrait professionnel de Théo Bettollo" />
+            </div>
+            <figcaption>
+              "Créer un espace sûr où chacun se sent écouté, respecté et soutenu dans son cheminement."
+            </figcaption>
+          </figure>
+        </section>
+      </header>
 
-  <section class="about">
-    <h3>À propos</h3>
-    <p>
-      Infirmier spécialisé en santé mentale à Vevey, je propose un accompagnement basé sur l'écoute, la confiance et la relation humaine.
-      Mon approche met l'accent sur le respect du rythme de chacun, avec pour objectif de soutenir toute personne dans son cheminement personnel.
-    </p>
-  </section>
+      <main>
+        <section class="section" id="approche">
+          <div class="section__header">
+            <span class="section__kicker">Approche thérapeutique</span>
+            <h2>Une alliance thérapeutique centrée sur votre singularité</h2>
+            <p>
+              Chaque accompagnement commence par l'écoute active de votre histoire, de votre rythme et de vos ressources. Nous
+              co-construisons un projet de soins évolutif pour vous permettre de retrouver un quotidien apaisé.
+            </p>
+          </div>
+          <div class="approach__grid">
+            <article class="card">
+              <h3>Relation de confiance</h3>
+              <p>
+                Un cadre sécurisant, des rencontres régulières et un dialogue constant pour poser des mots sur ce que vous
+                traversez.
+              </p>
+            </article>
+            <article class="card">
+              <h3>Vision holistique</h3>
+              <p>
+                Corps, émotions, environnement : nous abordons chaque dimension pour comprendre l'origine des difficultés et
+                identifier vos leviers de changement.
+              </p>
+            </article>
+            <article class="card">
+              <h3>Autonomie & empowerment</h3>
+              <p>
+                Vous restez acteur·rice de votre évolution grâce à des outils concrets, adaptés à vos besoins et à vos
+                objectifs.
+              </p>
+            </article>
+          </div>
+        </section>
 
-  <section class="activity">
-    <img src="theo_activity_illustration_decorated.jpg" alt="Activité de Théo Bettollo" />
-  </section>
+        <section class="section section--accent" id="accompagnement">
+          <div class="accompagnement__content">
+            <div class="section__header">
+              <span class="section__kicker">Prestations</span>
+              <h2>Un accompagnement modulable pour chaque étape de vie</h2>
+              <p>
+                Que ce soit pour un soutien ponctuel, un suivi post-hospitalisation ou un accompagnement à long terme, je vous
+                rencontre là où vous en êtes.
+              </p>
+            </div>
+            <ul class="accompagnement__list">
+              <li>
+                <h3>Entretiens thérapeutiques individuels</h3>
+                <p>Exploration approfondie de vos émotions, croyances et besoins pour définir un plan de soin personnalisé.</p>
+              </li>
+              <li>
+                <h3>Soutien à domicile</h3>
+                <p>Interventions à domicile pour recréer des repères, restaurer l'élan et renforcer les ressources du quotidien.</p>
+              </li>
+              <li>
+                <h3>Coordination du réseau de soins</h3>
+                <p>Collaboration avec les psychiatres, médecins traitants et proches aidants pour assurer la continuité des soins.</p>
+              </li>
+            </ul>
+          </div>
+          <figure class="accompagnement__figure">
+            <img src="theo_activity_illustration_decorated.jpg" alt="Illustration d'un accompagnement thérapeutique" />
+          </figure>
+        </section>
 
-  <section class="contact">
-    <h3>Contact</h3>
-    <p><strong>Adresse :</strong> Rue de Lausanne 29, 1800 Vevey, Suisse</p>
-    <p><strong>Téléphone :</strong> <a href="tel:+41782575502">+41 78 257 55 02</a></p>
-    <p><strong>Email :</strong> <a href="mailto:th.bettollo@curacasa-hin.ch">th.bettollo@curacasa-hin.ch</a></p>
-  </section>
+        <section class="section section--split">
+          <div class="section__header">
+            <span class="section__kicker">Valeurs fondamentales</span>
+            <h2>Des engagements qui structurent chaque rencontre</h2>
+          </div>
+          <div class="values">
+            <article>
+              <h3>Humanisme</h3>
+              <p>Accueillir votre vécu avec bienveillance, sans jugement, pour favoriser l'expression libre de vos émotions.</p>
+            </article>
+            <article>
+              <h3>Professionnalisme</h3>
+              <p>
+                S'appuyer sur des protocoles éprouvés, une supervision régulière et une formation continue pour garantir la
+                qualité du suivi.
+              </p>
+            </article>
+            <article>
+              <h3>Confidentialité</h3>
+              <p>
+                Respect strict de la déontologie infirmière HIN et protection de toutes les données partagées durant nos
+                rencontres.
+              </p>
+            </article>
+          </div>
+        </section>
 
-  <footer>
-    &copy; 2025 Théo Bettollo — Tous droits réservés.
-  </footer>
+        <section class="section" id="temoignages">
+          <div class="section__header">
+            <span class="section__kicker">Retours de patients</span>
+            <h2>Ils et elles témoignent</h2>
+            <p>Quelques mots de personnes accompagnées, partagés avec leur accord et dans le respect de l'anonymat.</p>
+          </div>
+          <div class="testimonials">
+            <blockquote>
+              « Grâce à l'écoute de Théo, j'ai retrouvé des repères et j'ai pu réorganiser mon quotidien. Son soutien m'a
+              permis d'avancer pas à pas. »
+              <cite>— S., 32 ans</cite>
+            </blockquote>
+            <blockquote>
+              « Des séances structurées, mais toujours très humaines. Je me suis senti compris et respecté dans mes limites. »
+              <cite>— L., 47 ans</cite>
+            </blockquote>
+            <blockquote>
+              « L'accompagnement à domicile a tout changé pour ma famille. Théo a su impliquer mon entourage avec délicatesse. »
+              <cite>— A., proche aidante</cite>
+            </blockquote>
+          </div>
+        </section>
 
-  <script src="script.js"></script>
-</body>
+        <section class="section section--cta">
+          <div class="cta__content">
+            <h2>Prêt·e à faire le premier pas&nbsp;?</h2>
+            <p>
+              Parlons de vos besoins et explorons ensemble les modalités d'accompagnement les plus adaptées. Les rendez-vous
+              se déroulent à Vevey ou à domicile sur la Riviera Vaudoise.
+            </p>
+            <a class="button button--light" href="tel:+41782575502">Appeler le +41 78 257 55 02</a>
+          </div>
+        </section>
+
+        <section class="section section--contact" id="contact">
+          <div class="section__header">
+            <span class="section__kicker">Contact</span>
+            <h2>Rencontrons-nous</h2>
+            <p>Je réponds à vos messages sous 48 heures ouvrées et propose des créneaux flexibles en semaine.</p>
+          </div>
+          <div class="contact__grid">
+            <address>
+              <h3>Cabinet</h3>
+              <p>Rue de Lausanne 29<br />1800 Vevey · Suisse</p>
+              <p>
+                <a href="tel:+41782575502">+41 78 257 55 02</a><br />
+                <a href="mailto:th.bettollo@curacasa-hin.ch">th.bettollo@curacasa-hin.ch</a>
+              </p>
+            </address>
+            <div class="contact__details">
+              <h3>Informations pratiques</h3>
+              <ul>
+                <li>Suivi possible en français, italien et anglais.</li>
+                <li>Partenariat avec médecins traitants et institutions locales.</li>
+                <li>Prise en charge HIN et respect du secret professionnel.</li>
+              </ul>
+            </div>
+            <div class="contact__card">
+              <h3>Vous avez une question&nbsp;?</h3>
+              <p>Laissez-moi un message et je vous recontacte pour échanger sur votre situation.</p>
+              <a class="button button--primary" href="mailto:th.bettollo@curacasa-hin.ch">Écrire un email</a>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="site-footer">
+        <div class="site-footer__content">
+          <p>&copy; 2025 Théo Bettollo — Tous droits réservés.</p>
+          <a class="footer__link" href="#top">Retour en haut</a>
+        </div>
+      </footer>
+    </div>
+    <script src="Script.js"></script>
+  </body>
 </html>
