@@ -13,74 +13,70 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <header class="app-header">
-      <div class="branding">
-        <div class="branding__eyebrow">Sphère complète</div>
-        <h1>Jeu de la vie de Conway</h1>
-        <p>
-          Simulation d'un automate cellulaire sur la surface d'une planète vivante. Cliquez pour modifier un état,
-          faites glisser pour faire tourner la sphère et observez l'évolution organique des cellules.
-        </p>
+    <main class="stage" aria-label="Simulation du jeu de la vie sur une sphère">
+      <div class="brand-badge" aria-hidden="true">
+        <span class="brand-badge__eyebrow">Sphère complète</span>
+        <span class="brand-badge__title">Jeu de la vie</span>
       </div>
-      <div class="controls" aria-label="Commandes de la simulation">
-        <div class="controls__group" role="group" aria-label="Transport">
+
+      <div class="hud" aria-live="polite">
+        <dl class="hud__row">
+          <div>
+            <dt>Génération</dt>
+            <dd id="generationCount">0</dd>
+          </div>
+          <div>
+            <dt>Cellules actives</dt>
+            <dd id="aliveCount">0</dd>
+          </div>
+          <div>
+            <dt>Zoom</dt>
+            <dd id="hudZoom">1.00x</dd>
+          </div>
+        </dl>
+        <p class="hud__status" id="simulationStatus">En pause</p>
+      </div>
+
+      <div class="stage__viewport">
+        <canvas id="globe" aria-label="Simulation du jeu de la vie sur sphère"></canvas>
+      </div>
+
+      <section class="control-dock" aria-label="Commandes de la simulation">
+        <div class="control-dock__row" role="group" aria-label="Transport">
           <button id="toggle" type="button">Démarrer</button>
           <button id="step" type="button">Avancer</button>
           <button id="randomize" type="button">Aléatoire</button>
           <button id="clear" type="button">Effacer</button>
         </div>
-        <div class="controls__group" role="group" aria-label="Réglages">
+        <div class="control-dock__row control-dock__row--sliders" role="group" aria-label="Réglages">
           <label>
-            Vitesse
-            <span id="speedValue" aria-live="polite">240&nbsp;ms</span>
+            <span>Vitesse</span>
+            <strong id="speedValue" aria-live="polite">240&nbsp;ms</strong>
             <input id="speed" type="range" min="50" max="800" step="10" value="240" />
           </label>
           <label>
-            Résolution
-            <span id="resolutionValue" aria-live="polite">10</span>
+            <span>Résolution</span>
+            <strong id="resolutionValue" aria-live="polite">10</strong>
             <input id="resolution" type="range" min="6" max="18" step="1" value="10" />
           </label>
           <label>
-            Zoom
-            <span id="zoomValue" aria-live="polite">100&nbsp;%</span>
+            <span>Zoom</span>
+            <strong id="zoomValue" aria-live="polite">100&nbsp;%</strong>
             <input id="zoom" type="range" min="70" max="125" step="1" value="100" />
           </label>
         </div>
-        <button
-          id="info"
-          type="button"
-          class="menu-button"
-          aria-haspopup="dialog"
-          aria-controls="infoPanel"
-          aria-expanded="false"
-        >
-          <span aria-hidden="true">☰</span>
-          Aide &amp; règles
-        </button>
-      </div>
-    </header>
-
-    <main>
-      <section class="canvas-wrapper">
-        <div class="hud" aria-live="polite">
-          <div class="hud__row">
-            <div class="hud__item">
-              <span class="hud__label">Génération</span>
-              <span class="hud__value" id="generationCount">0</span>
-            </div>
-            <div class="hud__item">
-              <span class="hud__label">Cellules actives</span>
-              <span class="hud__value" id="aliveCount">0</span>
-            </div>
-            <div class="hud__item">
-              <span class="hud__label">Zoom</span>
-              <span class="hud__value" id="hudZoom">1.00x</span>
-            </div>
-          </div>
-          <div class="hud__status" id="simulationStatus">En pause</div>
-        </div>
-        <canvas id="globe" aria-label="Simulation du jeu de la vie sur sphère"></canvas>
       </section>
+
+      <button
+        id="info"
+        type="button"
+        class="info-button"
+        aria-haspopup="dialog"
+        aria-controls="infoPanel"
+        aria-expanded="false"
+      >
+        Aide
+      </button>
     </main>
 
     <div class="modal" id="infoPanel" hidden>
@@ -91,8 +87,8 @@
         <section>
           <h3>Objectif</h3>
           <p>
-            Explorez une version sphérique du jeu de la vie et observez comment les colonies se déplacent librement
-            sur une planète sans bords ni coins. Ajustez les paramètres pour trouver vos propres phénomènes.
+            Explorez une version sphérique du jeu de la vie et observez comment les colonies se déplacent librement sur
+            une planète sans bords ni coins. Ajustez les paramètres pour trouver vos propres phénomènes.
           </p>
         </section>
         <section>
@@ -117,19 +113,11 @@
             <li>Les autres cellules meurent ou restent vides.</li>
           </ul>
           <p>
-            La sphère est construite à partir d'un cube projeté puis lissée pour créer une surface continue où les
-            cellules sont uniformément réparties.
+            La sphère est construite à partir d'un cube projeté puis lissée pour créer une surface continue où les cellules sont uniformément réparties.
           </p>
         </section>
       </div>
     </div>
-
-    <footer class="app-footer">
-      <p>
-        Inspiré du jeu original de John Conway, cette version expérimente un univers fermé et sans bords, visualisé
-        comme une planète lumineuse.
-      </p>
-    </footer>
 
     <script src="Script.js" type="module"></script>
   </body>
