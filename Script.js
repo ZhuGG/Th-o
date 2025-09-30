@@ -20,7 +20,7 @@ const infoPanel = document.getElementById("infoPanel");
 const infoClose = document.getElementById("infoClose");
 
 const perspective = 3;
-const baseRadius = 0.88;
+const baseRadius = 0.82;
 const lightDirection = normalize([0.35, 0.65, 0.42]);
 
 let cells = [];
@@ -400,6 +400,15 @@ function render() {
       ? decayColor(brightness, decays[i], !isFront)
       : deadColor(brightness, rotatedCenter[2], !isFront);
 
+    const gridIntensity = state[i]
+      ? 0.5
+      : decays[i] > 0.01
+      ? 0.35
+      : 0.24;
+    const gridAlpha = isFront ? gridIntensity : gridIntensity * 0.45;
+    const gridColor = `rgba(${isFront ? 86 : 68}, ${isFront ? 168 : 146}, ${isFront ? 182 : 170}, ${gridAlpha})`;
+    const gridWidth = clamp(radius * (isFront ? 0.0024 : 0.002), 0.45, isFront ? 1.45 : 1.2);
+
     data.push({
       index: i,
       depth: depthSum / corners.length,
@@ -407,6 +416,8 @@ function render() {
       color,
       alive,
       interactive: isFront,
+      gridColor,
+      gridWidth,
     });
   }
 
@@ -421,11 +432,9 @@ function render() {
     ctx.fillStyle = item.color;
     ctx.fill(item.path);
 
-    if (item.alive) {
-      ctx.strokeStyle = "rgba(12, 22, 32, 0.35)";
-      ctx.lineWidth = 1.2;
-      ctx.stroke(item.path);
-    }
+    ctx.strokeStyle = item.gridColor;
+    ctx.lineWidth = item.gridWidth;
+    ctx.stroke(item.path);
   }
 
   const rimGradient = ctx.createRadialGradient(width / 2, height / 2, radius * 0.8, width / 2, height / 2, radius * 1.08);
