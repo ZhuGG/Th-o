@@ -94,11 +94,34 @@ function rotateVector([x, y, z], rx, ry) {
 }
 
 function resizeCanvas() {
-  const rect = canvas.getBoundingClientRect();
+  if (!canvas) return;
+
+  let rect = canvas.getBoundingClientRect();
+
+  if (rect.width === 0 || rect.height === 0) {
+    const parent = canvas.parentElement;
+    if (parent) {
+      const parentRect = parent.getBoundingClientRect();
+      if (parentRect.width > 0 && parentRect.height > 0) {
+        rect = parentRect;
+      } else {
+        requestAnimationFrame(resizeCanvas);
+        return;
+      }
+    } else {
+      return;
+    }
+  }
+
   const dpr = window.devicePixelRatio || 1;
-  canvas.width = Math.max(1, Math.floor(rect.width * dpr));
-  canvas.height = Math.max(1, Math.floor(rect.height * dpr));
-  needsRender = true;
+  const targetWidth = Math.max(1, Math.floor(rect.width * dpr));
+  const targetHeight = Math.max(1, Math.floor(rect.height * dpr));
+
+  if (canvas.width !== targetWidth || canvas.height !== targetHeight) {
+    canvas.width = targetWidth;
+    canvas.height = targetHeight;
+    needsRender = true;
+  }
 }
 
 function buildSphere() {
@@ -451,6 +474,17 @@ function setupControls() {
 window.addEventListener("resize", () => {
   resizeCanvas();
 });
+
+if ("ResizeObserver" in window) {
+  const observer = new ResizeObserver(() => {
+    resizeCanvas();
+  });
+  if (canvas.parentElement) {
+    observer.observe(canvas.parentElement);
+  } else {
+    observer.observe(canvas);
+  }
+}
 
 setupControls();
 resizeCanvas();
