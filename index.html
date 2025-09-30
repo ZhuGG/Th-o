@@ -15,55 +15,119 @@
   <body>
     <header class="app-header">
       <div class="branding">
+        <div class="branding__eyebrow">Sphère complète</div>
         <h1>Jeu de la vie de Conway</h1>
         <p>
-          Simulation d'un automate cellulaire classique dont les cellules sont réparties sur la surface
-          d'une sphère. Cliquez pour modifier un état, faites glisser pour faire tourner la planète.
+          Simulation d'un automate cellulaire sur la surface d'une planète vivante. Cliquez pour modifier un état,
+          faites glisser pour faire tourner la sphère et observez l'évolution organique des cellules.
         </p>
       </div>
       <div class="controls" aria-label="Commandes de la simulation">
-        <button id="toggle" type="button">Démarrer</button>
-        <button id="step" type="button">Avancer</button>
-        <button id="randomize" type="button">Aléatoire</button>
-        <button id="clear" type="button">Effacer</button>
-        <label>
-          Vitesse
-          <span id="speedValue" aria-live="polite">240&nbsp;ms</span>
-          <input id="speed" type="range" min="50" max="800" step="10" value="240" />
-        </label>
-        <label>
-          Résolution
-          <span id="resolutionValue" aria-live="polite">10</span>
-          <input id="resolution" type="range" min="6" max="18" step="1" value="10" />
-        </label>
+        <div class="controls__group" role="group" aria-label="Transport">
+          <button id="toggle" type="button">Démarrer</button>
+          <button id="step" type="button">Avancer</button>
+          <button id="randomize" type="button">Aléatoire</button>
+          <button id="clear" type="button">Effacer</button>
+        </div>
+        <div class="controls__group" role="group" aria-label="Réglages">
+          <label>
+            Vitesse
+            <span id="speedValue" aria-live="polite">240&nbsp;ms</span>
+            <input id="speed" type="range" min="50" max="800" step="10" value="240" />
+          </label>
+          <label>
+            Résolution
+            <span id="resolutionValue" aria-live="polite">10</span>
+            <input id="resolution" type="range" min="6" max="18" step="1" value="10" />
+          </label>
+          <label>
+            Zoom
+            <span id="zoomValue" aria-live="polite">100&nbsp;%</span>
+            <input id="zoom" type="range" min="70" max="125" step="1" value="100" />
+          </label>
+        </div>
+        <button
+          id="info"
+          type="button"
+          class="menu-button"
+          aria-haspopup="dialog"
+          aria-controls="infoPanel"
+          aria-expanded="false"
+        >
+          <span aria-hidden="true">☰</span>
+          Aide &amp; règles
+        </button>
       </div>
     </header>
 
     <main>
       <section class="canvas-wrapper">
+        <div class="hud" aria-live="polite">
+          <div class="hud__row">
+            <div class="hud__item">
+              <span class="hud__label">Génération</span>
+              <span class="hud__value" id="generationCount">0</span>
+            </div>
+            <div class="hud__item">
+              <span class="hud__label">Cellules actives</span>
+              <span class="hud__value" id="aliveCount">0</span>
+            </div>
+            <div class="hud__item">
+              <span class="hud__label">Zoom</span>
+              <span class="hud__value" id="hudZoom">1.00x</span>
+            </div>
+          </div>
+          <div class="hud__status" id="simulationStatus">En pause</div>
+        </div>
         <canvas id="globe" aria-label="Simulation du jeu de la vie sur sphère"></canvas>
       </section>
-      <aside class="legend">
-        <h2>Règles sur sphère</h2>
-        <p>
-          Chaque cellule possède huit voisins les plus proches sur la sphère. À chaque génération&nbsp;:
-        </p>
-        <ul>
-          <li>Une cellule vivante survit avec 2 ou 3 voisins vivants.</li>
-          <li>Une cellule morte naît avec exactement 3 voisins vivants.</li>
-          <li>Les autres cellules meurent ou restent vides.</li>
-        </ul>
-        <p>
-          La sphère est construite à partir d'un cube projeté, puis lissée pour créer une surface continue
-          où les cellules sont uniformément réparties.
-        </p>
-      </aside>
     </main>
+
+    <div class="modal" id="infoPanel" hidden>
+      <div class="modal__backdrop" data-modal-close></div>
+      <div class="modal__dialog" role="dialog" aria-modal="true" aria-labelledby="infoTitle" tabindex="-1">
+        <button id="infoClose" type="button" class="modal__close" aria-label="Fermer le menu">×</button>
+        <h2 id="infoTitle">Guide de la mission</h2>
+        <section>
+          <h3>Objectif</h3>
+          <p>
+            Explorez une version sphérique du jeu de la vie et observez comment les colonies se déplacent librement
+            sur une planète sans bords ni coins. Ajustez les paramètres pour trouver vos propres phénomènes.
+          </p>
+        </section>
+        <section>
+          <h3>Contrôles</h3>
+          <ul>
+            <li><strong>Démarrer / Pause</strong> : lance ou arrête la génération automatique.</li>
+            <li><strong>Avancer</strong> : calcule une génération lorsque la simulation est en pause.</li>
+            <li><strong>Aléatoire</strong> : repeuple la sphère avec une configuration aléatoire.</li>
+            <li><strong>Effacer</strong> : réinitialise toutes les cellules.</li>
+            <li><strong>Vitesse</strong> : ajuste le temps entre deux générations automatiques.</li>
+            <li><strong>Résolution</strong> : modifie la finesse du maillage sphérique.</li>
+            <li><strong>Zoom</strong> : rapproche ou éloigne la caméra. Molette sur la sphère pour un ajustement fin.</li>
+            <li><strong>Interaction directe</strong> : cliquez pour inverser l'état d'une cellule, faites glisser pour faire tourner.</li>
+          </ul>
+        </section>
+        <section>
+          <h3>Règles du jeu de la vie</h3>
+          <p>Chaque cellule possède huit voisins les plus proches sur la sphère. À chaque génération :</p>
+          <ul>
+            <li>Une cellule vivante survit avec 2 ou 3 voisins vivants.</li>
+            <li>Une cellule morte naît avec exactement 3 voisins vivants.</li>
+            <li>Les autres cellules meurent ou restent vides.</li>
+          </ul>
+          <p>
+            La sphère est construite à partir d'un cube projeté puis lissée pour créer une surface continue où les
+            cellules sont uniformément réparties.
+          </p>
+        </section>
+      </div>
+    </div>
 
     <footer class="app-footer">
       <p>
-        Inspiré du jeu original de John Conway, cette version experimente un univers fermé et sans bords,
-        visualisé comme une planète lumineuse.
+        Inspiré du jeu original de John Conway, cette version expérimente un univers fermé et sans bords, visualisé
+        comme une planète lumineuse.
       </p>
     </footer>
 
