@@ -2,270 +2,71 @@
 <html lang="fr">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta
-      name="description"
-      content="Théo Bettollo, infirmier spécialisé en santé mentale à Vevey. Accompagnement sur-mesure, suivi à domicile et soutien relationnel pour adultes et adolescents."
-    />
-    <title>Théo Bettollo · Infirmier spécialisé en santé mentale</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Jeu de la vie sur une sphère</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="style.css" />
   </head>
-  <body id="top">
-    <div class="page">
-      <header class="site-header">
-        <nav class="nav">
-          <a class="nav__brand" href="#top">
-            <span class="nav__brand-title">Théo Bettollo</span>
-            <span class="nav__brand-subtitle">Infirmier spécialisé en santé mentale</span>
-          </a>
-          <button class="nav__toggle" type="button" aria-controls="primary-navigation" aria-expanded="false">
-            <span class="sr-only">Ouvrir le menu</span>
-            <span class="nav__toggle-line"></span>
-            <span class="nav__toggle-line"></span>
-            <span class="nav__toggle-line"></span>
-          </button>
-          <ul class="nav__links" id="primary-navigation">
-            <li><a href="#approche">Approche</a></li>
-            <li><a href="#accompagnement">Accompagnement</a></li>
-            <li><a href="#temoignages">Témoignages</a></li>
-            <li><a href="#contact">Contact</a></li>
-          </ul>
-        </nav>
-        <div class="site-header__intro">
-          <figure class="site-header__visual">
-            <img src="theo_header_image.jpg" alt="Carte de visite de Théo Bettollo, infirmier en santé mentale" />
-          </figure>
-          <p class="site-header__quote">
-            « Créer un espace sûr où chacun se sent écouté, respecté et soutenu dans son cheminement. »
-          </p>
-        </div>
-      </header>
+  <body>
+    <header class="app-header">
+      <div class="branding">
+        <h1>Jeu de la vie de Conway</h1>
+        <p>
+          Simulation d'un automate cellulaire classique dont les cellules sont réparties sur la surface
+          d'une sphère. Cliquez pour modifier un état, faites glisser pour faire tourner la planète.
+        </p>
+      </div>
+      <div class="controls" aria-label="Commandes de la simulation">
+        <button id="toggle" type="button">Démarrer</button>
+        <button id="step" type="button">Avancer</button>
+        <button id="randomize" type="button">Aléatoire</button>
+        <button id="clear" type="button">Effacer</button>
+        <label>
+          Vitesse
+          <span id="speedValue" aria-live="polite">240&nbsp;ms</span>
+          <input id="speed" type="range" min="50" max="800" step="10" value="240" />
+        </label>
+        <label>
+          Résolution
+          <span id="resolutionValue" aria-live="polite">10</span>
+          <input id="resolution" type="range" min="6" max="18" step="1" value="10" />
+        </label>
+      </div>
+    </header>
 
-      <main>
-        <section class="hero">
-          <div class="hero__content">
-            <span class="hero__kicker">Vevey · Riviera Vaudoise</span>
-            <h1>Prendre soin de votre santé mentale avec humanité et expertise</h1>
-            <p>
-              Infirmier diplômé spécialisé en santé mentale, j'accompagne adultes et adolescents avec une approche globale,
-              respectueuse du rythme de chacun et ancrée dans la relation de confiance.
-            </p>
-            <dl class="hero__highlights">
-              <div>
-                <dt>10+ ans</dt>
-                <dd>d'expérience en psychiatrie et santé mentale</dd>
-              </div>
-              <div>
-                <dt>Suivi personnalisé</dt>
-                <dd>à domicile ou en cabinet, selon vos besoins</dd>
-              </div>
-              <div>
-                <dt>Confidentialité</dt>
-                <dd>respect total de votre parcours et de votre rythme</dd>
-              </div>
-            </dl>
-            <div class="hero__cta">
-              <a class="button button--primary" href="#contact">Prendre rendez-vous</a>
-              <a class="button button--ghost" href="#approche">Découvrir l'approche</a>
-            </div>
-            <div class="hero__signature" aria-label="Signature de Théo Bettollo">
-              <span class="hero__initials" aria-hidden="true">TB</span>
-              <div>
-                <p class="hero__signature-name">Théo Bettollo</p>
-                <p class="hero__signature-role">Infirmier en santé mentale, MSc</p>
-              </div>
-            </div>
-          </div>
-          <aside class="hero__insight">
-            <h2>Comment se déroule la première rencontre&nbsp;?</h2>
-            <p>
-              Une séance de 60 minutes pour accueillir votre histoire, identifier vos ressources et définir ensemble les
-              objectifs prioritaires.
-            </p>
-            <ul>
-              <li>Évaluation clinique bienveillante</li>
-              <li>Plan de soin co-construit et modulable</li>
-              <li>Suivi hybride&nbsp;: cabinet et/ou domicile</li>
-            </ul>
-          </aside>
-        </section>
+    <main>
+      <section class="canvas-wrapper">
+        <canvas id="globe" aria-label="Simulation du jeu de la vie sur sphère"></canvas>
+      </section>
+      <aside class="legend">
+        <h2>Règles sur sphère</h2>
+        <p>
+          Chaque cellule possède huit voisins les plus proches sur la sphère. À chaque génération&nbsp;:
+        </p>
+        <ul>
+          <li>Une cellule vivante survit avec 2 ou 3 voisins vivants.</li>
+          <li>Une cellule morte naît avec exactement 3 voisins vivants.</li>
+          <li>Les autres cellules meurent ou restent vides.</li>
+        </ul>
+        <p>
+          La sphère est construite à partir d'un cube projeté, puis lissée pour créer une surface continue
+          où les cellules sont uniformément réparties.
+        </p>
+      </aside>
+    </main>
 
-        <section class="section" id="approche">
-          <div class="section__header">
-            <span class="section__kicker">Approche thérapeutique</span>
-            <h2>Une alliance thérapeutique centrée sur votre singularité</h2>
-            <p>
-              Chaque accompagnement commence par l'écoute active de votre histoire, de votre rythme et de vos ressources. Nous
-              co-construisons un projet de soins évolutif pour vous permettre de retrouver un quotidien apaisé.
-            </p>
-          </div>
-          <div class="approach__grid">
-            <article class="card">
-              <h3>Relation de confiance</h3>
-              <p>
-                Un cadre sécurisant, des rencontres régulières et un dialogue constant pour poser des mots sur ce que vous
-                traversez.
-              </p>
-            </article>
-            <article class="card">
-              <h3>Vision holistique</h3>
-              <p>
-                Corps, émotions, environnement : nous abordons chaque dimension pour comprendre l'origine des difficultés et
-                identifier vos leviers de changement.
-              </p>
-            </article>
-            <article class="card">
-              <h3>Autonomie & empowerment</h3>
-              <p>
-                Vous restez acteur·rice de votre évolution grâce à des outils concrets, adaptés à vos besoins et à vos
-                objectifs.
-              </p>
-            </article>
-          </div>
-        </section>
+    <footer class="app-footer">
+      <p>
+        Inspiré du jeu original de John Conway, cette version experimente un univers fermé et sans bords,
+        visualisé comme une planète lumineuse.
+      </p>
+    </footer>
 
-        <section class="section section--accent" id="accompagnement">
-          <div class="accompagnement__content">
-            <div class="section__header">
-              <span class="section__kicker">Prestations</span>
-              <h2>Un accompagnement modulable pour chaque étape de vie</h2>
-              <p>
-                Que ce soit pour un soutien ponctuel, un suivi post-hospitalisation ou un accompagnement à long terme, je vous
-                rencontre là où vous en êtes.
-              </p>
-            </div>
-            <ul class="accompagnement__list">
-              <li>
-                <h3>Entretiens thérapeutiques individuels</h3>
-                <p>Exploration approfondie de vos émotions, croyances et besoins pour définir un plan de soin personnalisé.</p>
-              </li>
-              <li>
-                <h3>Soutien à domicile</h3>
-                <p>Interventions à domicile pour recréer des repères, restaurer l'élan et renforcer les ressources du quotidien.</p>
-              </li>
-              <li>
-                <h3>Coordination du réseau de soins</h3>
-                <p>Collaboration avec les psychiatres, médecins traitants et proches aidants pour assurer la continuité des soins.</p>
-              </li>
-            </ul>
-          </div>
-          <figure class="accompagnement__figure">
-            <img src="theo_activity_illustration_decorated.jpg" alt="Illustration d'un accompagnement thérapeutique" />
-          </figure>
-        </section>
-
-        <section class="section section--split">
-          <div class="section__header">
-            <span class="section__kicker">Valeurs fondamentales</span>
-            <h2>Des engagements qui structurent chaque rencontre</h2>
-          </div>
-          <div class="values">
-            <article>
-              <h3>Humanisme</h3>
-              <p>Accueillir votre vécu avec bienveillance, sans jugement, pour favoriser l'expression libre de vos émotions.</p>
-            </article>
-            <article>
-              <h3>Professionnalisme</h3>
-              <p>
-                S'appuyer sur des protocoles éprouvés, une supervision régulière et une formation continue pour garantir la
-                qualité du suivi.
-              </p>
-            </article>
-            <article>
-              <h3>Confidentialité</h3>
-              <p>
-                Respect strict de la déontologie infirmière HIN et protection de toutes les données partagées durant nos
-                rencontres.
-              </p>
-            </article>
-          </div>
-        </section>
-
-        <section class="section" id="temoignages">
-          <div class="section__header">
-            <span class="section__kicker">Retours de patients</span>
-            <h2>Ils et elles témoignent</h2>
-            <p>Quelques mots de personnes accompagnées, partagés avec leur accord et dans le respect de l'anonymat.</p>
-          </div>
-          <div class="testimonials">
-            <blockquote>
-              « Grâce à l'écoute de Théo, j'ai retrouvé des repères et j'ai pu réorganiser mon quotidien. Son soutien m'a
-              permis d'avancer pas à pas. »
-              <cite>— S., 32 ans</cite>
-            </blockquote>
-            <blockquote>
-              « Des séances structurées, mais toujours très humaines. Je me suis senti compris et respecté dans mes limites. »
-              <cite>— L., 47 ans</cite>
-            </blockquote>
-            <blockquote>
-              « L'accompagnement à domicile a tout changé pour ma famille. Théo a su impliquer mon entourage avec délicatesse. »
-              <cite>— A., proche aidante</cite>
-            </blockquote>
-          </div>
-        </section>
-
-        <section class="section section--cta">
-          <div class="cta__content">
-            <h2>Prêt·e à faire le premier pas&nbsp;?</h2>
-            <p>
-              Parlons de vos besoins et explorons ensemble les modalités d'accompagnement les plus adaptées. Les rendez-vous
-              se déroulent à Vevey ou à domicile sur la Riviera Vaudoise.
-            </p>
-            <p class="cta__details">
-              Contactez-moi par téléphone au +41 78 257 55 02 ou par email à th.bettollo@curacasa-hin.ch pour convenir d'un
-              rendez-vous.
-            </p>
-          </div>
-        </section>
-
-        <section class="section section--contact" id="contact">
-          <div class="section__header">
-            <span class="section__kicker">Contact</span>
-            <h2>Rencontrons-nous</h2>
-            <p>Je réponds à vos messages sous 48 heures ouvrées et propose des créneaux flexibles en semaine.</p>
-          </div>
-          <div class="contact__grid">
-            <address>
-              <h3>Cabinet</h3>
-              <p>Rue de Lausanne 29<br />1800 Vevey · Suisse</p>
-              <p>
-                <span class="contact__info">+41 78 257 55 02</span><br />
-                <span class="contact__info">th.bettollo@curacasa-hin.ch</span>
-              </p>
-            </address>
-            <div class="contact__details">
-              <h3>Informations pratiques</h3>
-              <ul>
-                <li>Suivi possible en français, italien et anglais.</li>
-                <li>Partenariat avec médecins traitants et institutions locales.</li>
-                <li>Prise en charge HIN et respect du secret professionnel.</li>
-              </ul>
-            </div>
-            <div class="contact__card">
-              <h3>Vous avez une question&nbsp;?</h3>
-              <p>Laissez-moi un message et je vous recontacte pour échanger sur votre situation.</p>
-              <p class="contact__note">
-                Pour toute demande, merci d'utiliser le téléphone ou l'email indiqués. Je vous réponds dans les plus brefs
-                délais.
-              </p>
-            </div>
-          </div>
-        </section>
-      </main>
-
-      <footer class="site-footer">
-        <div class="site-footer__content">
-          <p>&copy; 2025 Théo Bettollo — Tous droits réservés.</p>
-          <a class="footer__link" href="#top">Retour en haut</a>
-        </div>
-      </footer>
-    </div>
-    <script src="Script.js"></script>
+    <script src="Script.js" type="module"></script>
   </body>
 </html>
