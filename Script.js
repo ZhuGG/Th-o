@@ -145,17 +145,42 @@ function resizeCanvas() {
   }
 }
 
-function buildSphere() {
-  faceSize = parseInt(resolutionInput.value, 10);
-  resolutionValue.textContent = faceSize.toString();
-
-  const cellsList = [];
-  const offsets = [
+function buildCellOutline(face, row, col) {
+  const outline = [];
+  const baseCorners = [
     [-0.5, -0.5],
     [0.5, -0.5],
     [0.5, 0.5],
     [-0.5, 0.5],
   ];
+  const segmentsPerEdge = Math.min(4, Math.max(2, Math.round(faceSize / 8)));
+
+  for (let edge = 0; edge < baseCorners.length; edge += 1) {
+    const start = baseCorners[edge];
+    const end = baseCorners[(edge + 1) % baseCorners.length];
+
+    for (let step = 0; step <= segmentsPerEdge; step += 1) {
+      if (edge !== 0 && step === 0) continue;
+      if (edge === baseCorners.length - 1 && step === segmentsPerEdge) continue;
+
+      const t = step / segmentsPerEdge;
+      const dx = start[0] + (end[0] - start[0]) * t;
+      const dy = start[1] + (end[1] - start[1]) * t;
+      const u = ((col + 0.5 + dx) / faceSize) * 2 - 1;
+      const v = ((row + 0.5 + dy) / faceSize) * 2 - 1;
+
+      outline.push(cubeToSphere(face, u, v));
+    }
+  }
+
+  return outline;
+}
+
+function buildSphere() {
+  faceSize = parseInt(resolutionInput.value, 10);
+  resolutionValue.textContent = faceSize.toString();
+
+  const cellsList = [];
 
   for (let face = 0; face < 6; face += 1) {
     for (let row = 0; row < faceSize; row += 1) {
@@ -164,18 +189,14 @@ function buildSphere() {
         const vCenter = ((row + 0.5) / faceSize) * 2 - 1;
         const center = cubeToSphere(face, uCenter, vCenter);
 
-        const corners = offsets.map(([dx, dy]) => {
-          const u = ((col + 0.5 + dx) / faceSize) * 2 - 1;
-          const v = ((row + 0.5 + dy) / faceSize) * 2 - 1;
-          return cubeToSphere(face, u, v);
-        });
+        const outline = buildCellOutline(face, row, col);
 
         cellsList.push({
           face,
           row,
           col,
           center,
-          corners,
+          outline,
         });
       }
     }
@@ -221,6 +242,10 @@ function computeNeighbors() {
 }
 
 function insertNeighbor(list, candidate) {
+  const maxNeighbors = 8;
+  if (list.length === maxNeighbors && candidate.distance >= list[list.length - 1].distance) {
+    return;
+  }
   let inserted = false;
 
   for (let i = 0; i < list.length; i += 1) {
@@ -235,8 +260,8 @@ function insertNeighbor(list, candidate) {
     list.push(candidate);
   }
 
-  if (list.length > 8) {
-    list.length = 8;
+  if (list.length > maxNeighbors) {
+    list.length = maxNeighbors;
   }
 }
 
@@ -352,6 +377,26 @@ function render() {
   ctx.fillStyle = background;
   ctx.fillRect(0, 0, width, height);
 
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(width / 2, height / 2, radius, 0, Math.PI * 2);
+  ctx.closePath();
+
+  const surfaceGradient = ctx.createRadialGradient(
+    width * 0.72,
+    height * 0.32,
+    radius * 0.15,
+    width / 2,
+    height / 2,
+    radius,
+  );
+  surfaceGradient.addColorStop(0, "rgba(78, 124, 255, 0.55)");
+  surfaceGradient.addColorStop(0.45, "rgba(32, 60, 148, 0.55)");
+  surfaceGradient.addColorStop(1, "rgba(5, 12, 38, 0.85)");
+  ctx.fillStyle = surfaceGradient;
+  ctx.fill();
+  ctx.clip();
+
   const data = [];
 
   for (let i = 0; i < cells.length; i += 1) {
@@ -367,8 +412,8 @@ function render() {
 
     const scaleFactor = cellScale(state[i] === 1, ages[i], decays[i]);
 
-    for (let c = 0; c < cell.corners.length; c += 1) {
-      const corner = rotateVector(cell.corners[c], rotationX, rotationY);
+    for (let c = 0; c < cell.outline.length; c += 1) {
+      const corner = rotateVector(cell.outline[c], rotationX, rotationY);
       const scale = perspective / (perspective - corner[2]);
       let x = width / 2 + corner[0] * scale * radius;
       let y = height / 2 + corner[1] * scale * radius;
@@ -401,13 +446,13 @@ function render() {
       : deadColor(brightness, rotatedCenter[2], !isFront);
 
     const gridIntensity = state[i]
-      ? 0.5
+      ? 0.46
       : decays[i] > 0.01
-      ? 0.35
-      : 0.24;
-    const gridAlpha = isFront ? gridIntensity : gridIntensity * 0.45;
-    const gridColor = `rgba(${isFront ? 86 : 68}, ${isFront ? 168 : 146}, ${isFront ? 182 : 170}, ${gridAlpha})`;
-    const gridWidth = clamp(radius * (isFront ? 0.0024 : 0.002), 0.45, isFront ? 1.45 : 1.2);
+      ? 0.32
+      : 0.2;
+    const gridAlpha = isFront ? gridIntensity : gridIntensity * 0.4;
+    const gridColor = `rgba(${isFront ? 116 : 84}, ${isFront ? 196 : 152}, ${isFront ? 212 : 176}, ${gridAlpha})`;
+    const gridWidth = clamp(radius * (isFront ? 0.0019 : 0.0016), 0.35, isFront ? 1.25 : 1.05);
 
     data.push({
       index: i,
@@ -429,13 +474,30 @@ function render() {
 
   for (let i = 0; i < data.length; i += 1) {
     const item = data[i];
+    ctx.save();
+    if (item.alive) {
+      ctx.shadowColor = "rgba(132, 242, 199, 0.45)";
+      ctx.shadowBlur = radius * 0.015;
+    }
     ctx.fillStyle = item.color;
     ctx.fill(item.path);
+    ctx.restore();
 
     ctx.strokeStyle = item.gridColor;
     ctx.lineWidth = item.gridWidth;
     ctx.stroke(item.path);
   }
+
+  ctx.restore();
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(width / 2, height / 2, radius * 1.08, 0, Math.PI * 2);
+  ctx.closePath();
+  ctx.strokeStyle = "rgba(84, 192, 255, 0.16)";
+  ctx.lineWidth = radius * 0.015;
+  ctx.stroke();
+  ctx.restore();
 
   const rimGradient = ctx.createRadialGradient(width / 2, height / 2, radius * 0.8, width / 2, height / 2, radius * 1.08);
   rimGradient.addColorStop(0, "rgba(8, 16, 32, 0)");
@@ -444,46 +506,55 @@ function render() {
   ctx.beginPath();
   ctx.arc(width / 2, height / 2, radius * 1.08, 0, Math.PI * 2);
   ctx.fill();
+
+  ctx.save();
+  ctx.globalCompositeOperation = "screen";
+  const highlight = ctx.createRadialGradient(width * 0.62, height * 0.32, radius * 0.05, width * 0.62, height * 0.32, radius * 0.45);
+  highlight.addColorStop(0, "rgba(200, 246, 255, 0.55)");
+  highlight.addColorStop(1, "rgba(200, 246, 255, 0)");
+  ctx.fillStyle = highlight;
+  ctx.beginPath();
+  ctx.arc(width / 2, height / 2, radius * 1.05, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
 }
 
 function cellScale(alive, age, decay) {
   if (alive) {
-    if (age <= 1) return 0.62;
-    if (age <= 3) return 0.82;
-    if (age <= 6) return 0.98;
-    return 1.08;
+    const maturity = Math.min(age, 12);
+    return clamp(0.82 + maturity * 0.022, 0.82, 1.08);
   }
 
   if (decay > 0.01) {
-    return clamp(0.85 + decay * 0.3, 0.85, 1.12);
+    return clamp(0.78 + decay * 0.22, 0.78, 0.96);
   }
 
-  return 1;
+  return 0.76;
 }
 
 function aliveColor(brightness, age, isBack) {
-  const stage = Math.min(age, 10);
-  const hue = clamp(200 - stage * 9, 110, 200);
-  const saturation = clamp(58 + stage * 3, 58, 88);
-  const lightness = clamp(30 + brightness * 30 + stage * 0.8, 25, 70);
-  const alpha = isBack ? 0.38 : 0.9;
+  const stage = Math.min(age, 12);
+  const hue = clamp(198 - stage * 6, 132, 198);
+  const saturation = clamp(62 + stage * 2.4, 62, 90);
+  const lightness = clamp(34 + brightness * 28 + stage * 1.1, 30, 74);
+  const alpha = isBack ? 0.42 : 0.95;
   return hslToRgbaString(hue, saturation, lightness, alpha);
 }
 
 function decayColor(brightness, decay, isBack) {
-  const hue = clamp(210 - decay * 70, 140, 210);
-  const saturation = clamp(35 + decay * 45, 35, 85);
-  const lightness = clamp(18 + brightness * 22 + decay * 18, 18, 60);
-  const alpha = isBack ? 0.28 : 0.65;
+  const hue = clamp(212 - decay * 80, 150, 212);
+  const saturation = clamp(38 + decay * 48, 38, 88);
+  const lightness = clamp(20 + brightness * 24 + decay * 16, 20, 62);
+  const alpha = isBack ? 0.32 : 0.7;
   return hslToRgbaString(hue, saturation, lightness, alpha);
 }
 
 function deadColor(brightness, depth, isBack) {
   const horizon = Math.max(0, Math.min(1, 1 - depth));
-  const hue = 215;
-  const saturation = 32 + horizon * 10;
-  const lightness = clamp(12 + brightness * 20 + horizon * 5, 10, 45);
-  const alpha = isBack ? 0.2 : 0.35;
+  const hue = 218;
+  const saturation = 28 + horizon * 12;
+  const lightness = clamp(14 + brightness * 24 + horizon * 6, 12, 48);
+  const alpha = isBack ? 0.22 : 0.38;
   return hslToRgbaString(hue, saturation, lightness, alpha);
 }
 
