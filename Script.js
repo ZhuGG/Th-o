@@ -55,6 +55,16 @@ function normalize(vec) {
   return [vec[0] / length, vec[1] / length, vec[2] / length];
 }
 
+function vectorKey(vec) {
+  const precision = 1e6;
+  return `${Math.round(vec[0] * precision)},${Math.round(vec[1] * precision)},${Math.round(vec[2] * precision)}`;
+}
+
+function surfaceDistance(base, target) {
+  const dot = base[0] * target[0] + base[1] * target[1] + base[2] * target[2];
+  return 1 - dot;
+}
+
 function cubeToSphere(face, u, v) {
   let x;
   let y;
@@ -181,6 +191,8 @@ function buildSphere() {
   resolutionValue.textContent = faceSize.toString();
 
   const cellsList = [];
+  const sharedEdges = new Map();
+  const sharedCorners = new Map();
 
   for (let face = 0; face < 6; face += 1) {
     for (let row = 0; row < faceSize; row += 1) {
@@ -190,6 +202,43 @@ function buildSphere() {
         const center = cubeToSphere(face, uCenter, vCenter);
 
         const outline = buildCellOutline(face, row, col);
+
+        const left = (col / faceSize) * 2 - 1;
+        const right = ((col + 1) / faceSize) * 2 - 1;
+        const top = (row / faceSize) * 2 - 1;
+        const bottom = ((row + 1) / faceSize) * 2 - 1;
+
+        const edgeSamples = [
+          cubeToSphere(face, (left + right) / 2, top),
+          cubeToSphere(face, right, (top + bottom) / 2),
+          cubeToSphere(face, (left + right) / 2, bottom),
+          cubeToSphere(face, left, (top + bottom) / 2),
+        ];
+
+        const cornerSamples = [
+          cubeToSphere(face, left, top),
+          cubeToSphere(face, right, top),
+          cubeToSphere(face, right, bottom),
+          cubeToSphere(face, left, bottom),
+        ];
+
+        const cellIndex = cellsList.length;
+
+        for (let e = 0; e < edgeSamples.length; e += 1) {
+          const key = vectorKey(edgeSamples[e]);
+          if (!sharedEdges.has(key)) {
+            sharedEdges.set(key, []);
+          }
+          sharedEdges.get(key).push(cellIndex);
+        }
+
+        for (let c = 0; c < cornerSamples.length; c += 1) {
+          const key = vectorKey(cornerSamples[c]);
+          if (!sharedCorners.has(key)) {
+            sharedCorners.set(key, []);
+          }
+          sharedCorners.get(key).push(cellIndex);
+        }
 
         cellsList.push({
           face,
@@ -209,9 +258,7 @@ function buildSphere() {
   ageBuffer = new Uint16Array(cells.length);
   decays = new Float32Array(cells.length);
   decayBuffer = new Float32Array(cells.length);
-  neighbors = new Array(cells.length);
-
-  computeNeighbors();
+  computeNeighbors(sharedEdges, sharedCorners);
   running = false;
   generation = 0;
   aliveCount = 0;
@@ -220,48 +267,54 @@ function buildSphere() {
   needsRender = true;
 }
 
-function computeNeighbors() {
+function computeNeighbors(sharedEdges, sharedCorners) {
+  const adjacency = Array.from({ length: cells.length }, () => new Set());
+  neighbors = new Array(cells.length);
+
+  for (const list of sharedEdges.values()) {
+    if (list.length < 2) continue;
+    for (let i = 0; i < list.length; i += 1) {
+      for (let j = i + 1; j < list.length; j += 1) {
+        adjacency[list[i]].add(list[j]);
+        adjacency[list[j]].add(list[i]);
+      }
+    }
+  }
+
+  for (const list of sharedCorners.values()) {
+    if (list.length < 2) continue;
+    for (let i = 0; i < list.length; i += 1) {
+      for (let j = i + 1; j < list.length; j += 1) {
+        adjacency[list[i]].add(list[j]);
+        adjacency[list[j]].add(list[i]);
+      }
+    }
+  }
+
   const centers = cells.map((cell) => cell.center);
 
-  for (let i = 0; i < cells.length; i += 1) {
-    const base = centers[i];
-    const list = [];
+  for (let i = 0; i < adjacency.length; i += 1) {
+    const neighborsSet = adjacency[i];
 
-    for (let j = 0; j < centers.length; j += 1) {
-      if (i === j) continue;
-
-      const target = centers[j];
-      const dot = base[0] * target[0] + base[1] * target[1] + base[2] * target[2];
-      const distance = 1 - dot; // proportionnel à l'angle
-
-      insertNeighbor(list, { index: j, distance });
+    if (neighborsSet.size < 8) {
+      const candidates = [];
+      const base = centers[i];
+      for (let j = 0; j < centers.length; j += 1) {
+        if (j === i || neighborsSet.has(j)) continue;
+        candidates.push({ index: j, distance: surfaceDistance(base, centers[j]) });
+      }
+      candidates.sort((a, b) => a.distance - b.distance);
+      for (let k = 0; k < candidates.length && neighborsSet.size < 8; k += 1) {
+        neighborsSet.add(candidates[k].index);
+      }
     }
 
-    neighbors[i] = list.map((item) => item.index);
-  }
-}
-
-function insertNeighbor(list, candidate) {
-  const maxNeighbors = 8;
-  if (list.length === maxNeighbors && candidate.distance >= list[list.length - 1].distance) {
-    return;
-  }
-  let inserted = false;
-
-  for (let i = 0; i < list.length; i += 1) {
-    if (candidate.distance < list[i].distance) {
-      list.splice(i, 0, candidate);
-      inserted = true;
-      break;
+    const sorted = Array.from(neighborsSet);
+    sorted.sort((a, b) => surfaceDistance(centers[i], centers[a]) - surfaceDistance(centers[i], centers[b]));
+    if (sorted.length > 8) {
+      sorted.length = 8;
     }
-  }
-
-  if (!inserted) {
-    list.push(candidate);
-  }
-
-  if (list.length > maxNeighbors) {
-    list.length = maxNeighbors;
+    neighbors[i] = sorted;
   }
 }
 
