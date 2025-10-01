@@ -127,6 +127,7 @@ const App = (): JSX.Element => {
   const filterRef = useRef<Filter | null>(null);
   const [grain, setGrain] = useState(0.15);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const initialGrainRef = useRef(grain);
 
   const fitSprite = useCallback(() => {
     const app = appRef.current;
@@ -147,105 +148,164 @@ const App = (): JSX.Element => {
   }, []);
 
   useEffect(() => {
+    let isUnmounted = false;
+    let destroy: (() => void) | undefined;
+
+    const cleanupApplication = () => {
+      if (destroy) {
+        destroy();
+        destroy = undefined;
+      }
+    };
+
     const setup = async () => {
       const app = new Application();
-      await app.init({
-        backgroundAlpha: 1,
-        background: '#050505',
-        resizeTo: window,
-        antialias: true,
-      });
+      let colorTexture: Texture | undefined;
+      let normalTexture: Texture | undefined;
+      let tickerCallback: ((delta: number) => void) | undefined;
 
-      appRef.current = app;
+      try {
+        await app.init({
+          backgroundAlpha: 1,
+          background: '#050505',
+          resizeTo: window,
+          antialias: true,
+        });
 
-      if (hostRef.current) {
-        hostRef.current.innerHTML = '';
-        hostRef.current.appendChild(app.canvas);
-      }
-
-      const { color, normal } = await createDefaultAssets();
-      const sprite = new Sprite(color);
-      sprite.anchor.set(0.5);
-      spriteRef.current = sprite;
-
-      const filter = new Filter(undefined, fragmentShader, {
-        normalMap: normal,
-        lightPos: new Float32Array([0.5, 0.5]),
-        noiseAmount: grain,
-        time: 0,
-      });
-
-      filterRef.current = filter;
-      sprite.filters = [filter];
-
-      app.stage.addChild(sprite);
-      fitSprite();
-
-      let elapsed = 0;
-      app.ticker.add((delta) => {
-        elapsed += delta / 60;
-        if (filterRef.current) {
-          filterRef.current.uniforms.time = elapsed;
-        }
-      });
-
-      const handlePointerMove = (event: PointerEvent) => {
-        if (!filterRef.current || !appRef.current) {
+        if (isUnmounted) {
+          app.destroy(true);
           return;
         }
 
-        const rect = appRef.current.canvas.getBoundingClientRect();
-        const x = (event.clientX - rect.left) / rect.width;
-        const y = (event.clientY - rect.top) / rect.height;
-        const uniforms = filterRef.current.uniforms as Record<string, unknown>;
-        const light = uniforms.lightPos as Float32Array | number[] | undefined;
-        if (light instanceof Float32Array) {
-          light[0] = x;
-          light[1] = 1.0 - y;
-        } else {
-          filterRef.current.uniforms.lightPos = new Float32Array([x, 1.0 - y]);
-        }
-      };
+        appRef.current = app;
 
-      const resetLight = () => {
-        if (filterRef.current) {
+        if (hostRef.current) {
+          hostRef.current.innerHTML = '';
+          hostRef.current.appendChild(app.canvas);
+        }
+
+        const assets = await createDefaultAssets();
+        colorTexture = assets.color;
+        normalTexture = assets.normal;
+
+        if (isUnmounted) {
+          colorTexture.destroy(true);
+          normalTexture.destroy(true);
+          app.destroy(true);
+          if (appRef.current === app) {
+            appRef.current = null;
+          }
+          return;
+        }
+
+        const sprite = new Sprite(colorTexture);
+        sprite.anchor.set(0.5);
+        spriteRef.current = sprite;
+
+        const filter = new Filter(undefined, fragmentShader, {
+          normalMap: normalTexture,
+          lightPos: new Float32Array([0.5, 0.5]),
+          noiseAmount: initialGrainRef.current,
+          time: 0,
+        });
+
+        filterRef.current = filter;
+        sprite.filters = [filter];
+
+        app.stage.addChild(sprite);
+        fitSprite();
+
+        let elapsed = 0;
+        tickerCallback = (delta: number) => {
+          elapsed += delta / 60;
+          if (filterRef.current) {
+            filterRef.current.uniforms.time = elapsed;
+          }
+        };
+        app.ticker.add(tickerCallback);
+
+        const handlePointerMove = (event: PointerEvent) => {
+          if (!filterRef.current || !appRef.current) {
+            return;
+          }
+
+          const rect = appRef.current.canvas.getBoundingClientRect();
+          const x = (event.clientX - rect.left) / rect.width;
+          const y = (event.clientY - rect.top) / rect.height;
           const uniforms = filterRef.current.uniforms as Record<string, unknown>;
           const light = uniforms.lightPos as Float32Array | number[] | undefined;
           if (light instanceof Float32Array) {
-            light[0] = 0.5;
-            light[1] = 0.5;
+            light[0] = x;
+            light[1] = 1.0 - y;
           } else {
-            filterRef.current.uniforms.lightPos = new Float32Array([0.5, 0.5]);
+            filterRef.current.uniforms.lightPos = new Float32Array([x, 1.0 - y]);
           }
+        };
+
+        const resetLight = () => {
+          if (filterRef.current) {
+            const uniforms = filterRef.current.uniforms as Record<string, unknown>;
+            const light = uniforms.lightPos as Float32Array | number[] | undefined;
+            if (light instanceof Float32Array) {
+              light[0] = 0.5;
+              light[1] = 0.5;
+            } else {
+              filterRef.current.uniforms.lightPos = new Float32Array([0.5, 0.5]);
+            }
+          }
+        };
+
+        app.canvas.addEventListener('pointermove', handlePointerMove);
+        app.canvas.addEventListener('pointerleave', resetLight);
+        window.addEventListener('resize', fitSprite);
+
+        destroy = () => {
+          app.canvas.removeEventListener('pointermove', handlePointerMove);
+          app.canvas.removeEventListener('pointerleave', resetLight);
+          window.removeEventListener('resize', fitSprite);
+          if (tickerCallback) {
+            app.ticker.remove(tickerCallback);
+          }
+          app.destroy(true);
+          colorTexture?.destroy(true);
+          normalTexture?.destroy(true);
+          if (appRef.current === app) {
+            appRef.current = null;
+          }
+          if (spriteRef.current === sprite) {
+            spriteRef.current = null;
+          }
+          if (filterRef.current === filter) {
+            filterRef.current = null;
+          }
+        };
+      } catch (error) {
+        if (tickerCallback) {
+          app.ticker.remove(tickerCallback);
         }
-      };
-
-      app.canvas.addEventListener('pointermove', handlePointerMove);
-      app.canvas.addEventListener('pointerleave', resetLight);
-      window.addEventListener('resize', fitSprite);
-
-      return () => {
-        app.canvas.removeEventListener('pointermove', handlePointerMove);
-        app.canvas.removeEventListener('pointerleave', resetLight);
-        window.removeEventListener('resize', fitSprite);
         app.destroy(true);
-      };
+        colorTexture?.destroy(true);
+        normalTexture?.destroy(true);
+        throw error;
+      }
     };
 
-    let destroy: (() => void) | undefined;
-
-    setup().then((cleanup) => {
-      destroy = cleanup ?? destroy;
+    setup().catch((error) => {
+      console.error('Failed to initialize Atelier Lumière', error);
+    }).finally(() => {
+      if (isUnmounted) {
+        cleanupApplication();
+      }
     });
 
     return () => {
-      if (destroy) {
-        destroy();
-      }
+      isUnmounted = true;
+      cleanupApplication();
     };
   }, [fitSprite]);
 
   useEffect(() => {
+    initialGrainRef.current = grain;
     if (filterRef.current) {
       filterRef.current.uniforms.noiseAmount = grain;
     }
